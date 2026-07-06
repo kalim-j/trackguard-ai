@@ -1,3 +1,11 @@
+-- Clean reset database schema (drops any existing/partial tables from previous runs)
+DROP TABLE IF EXISTS alerts CASCADE;
+DROP TABLE IF EXISTS animal_detections CASCADE;
+DROP TABLE IF EXISTS train_positions CASCADE;
+DROP TABLE IF EXISTS sensors CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS incidents CASCADE;
+
 -- Users table
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
