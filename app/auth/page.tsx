@@ -8,7 +8,7 @@ import Hero3DScene from '@/components/3d/Hero3DScene';
 import CanvasErrorBoundary from '@/components/CanvasErrorBoundary';
 
 export default function LoginPage() {
-  const { user, loading, signInWithGoogle } = useAuth();
+  const { user, loading, signInWithGoogle, signInDemo } = useAuth();
   const router = useRouter();
 
   // Redirect to dashboard if logged in
@@ -83,6 +83,14 @@ export default function LoginPage() {
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
           </svg>
           Continue with Google
+        </button>
+
+        {/* Demo Admin Login Button (Bypass) */}
+        <button
+          onClick={signInDemo}
+          className="w-full py-3 bg-gradient-to-r from-amber-500/10 to-amber-600/15 border border-amber-500/30 rounded-lg text-xs font-mono font-bold text-amber-400 hover:border-amber-400 hover:text-amber-300 transition-all hover:scale-102 flex items-center justify-center gap-1.5"
+        >
+          🔑 Bypass with Demo Admin
         </button>
 
         {/* Terms disclosure */}

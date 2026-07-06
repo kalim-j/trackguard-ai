@@ -32,6 +32,7 @@ interface AuthContextType {
   user: AuthUser | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInDemo: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -188,6 +189,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signInDemo = async () => {
+    setLoading(true);
+    try {
+      const mockFirebaseUser = {
+        uid: 'demo-user-uid',
+        email: 'kalim.cse@rathinam.edu',
+        displayName: 'Kalim J',
+        photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150',
+        emailVerified: true,
+      } as unknown as FirebaseUser;
+
+      const mockDbUser: DbUser = {
+        id: 'demo-db-id',
+        firebase_uid: 'demo-user-uid',
+        email: 'kalim.cse@rathinam.edu',
+        display_name: 'Kalim J',
+        photo_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150',
+        role: 'admin',
+        zone: 'SR',
+        last_login: new Date().toISOString(),
+        created_at: new Date().toISOString()
+      };
+
+      setUser({
+        ...mockFirebaseUser,
+        role: mockDbUser.role,
+        zone: mockDbUser.zone,
+        dbId: mockDbUser.id
+      } as AuthUser);
+    } catch (e) {
+      console.error('Demo sign-in failed', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const signOut = async () => {
     setLoading(true);
     try {
@@ -201,7 +238,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInDemo, signOut }}>
       {children}
     </AuthContext.Provider>
   );
