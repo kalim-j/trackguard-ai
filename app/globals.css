@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #050A18; /* Navy 950 as default */
+  --foreground: #F3F4F6; /* Light gray text */
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  background-image: radial-gradient(
+    rgba(0, 212, 255, 0.06) 1px, transparent 1px
+  );
+  background-size: 32px 32px;
+  min-height: 100vh;
+}
+
+/* Glassmorphism Styles */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 212, 255, 0.12);
+  border-radius: 16px;
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(0, 212, 255, 0.25);
+  box-shadow: 0 8px 30px rgba(0, 212, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Glowing effects */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.glow-red {
+  box-shadow: 0 0 20px rgba(255, 59, 59, 0.3);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+}
+
+.glow-yellow {
+  box-shadow: 0 0 20px rgba(255, 179, 71, 0.2);
+}
+
+/* Alert Pulsing */
+.pulse-red {
+  animation: pulseRed 1s infinite;
+}
+
+@keyframes pulseRed {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 20px rgba(255, 59, 59, 0.4);
+  }
+  50% {
+    opacity: 0.3;
+    box-shadow: 0 0 5px rgba(255, 59, 59, 0.1);
+  }
+}
+
+.pulse-green {
+  animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Leaflet Map Styles Overwrite */
+.leaflet-container {
+  background-color: #0A0F1E !important;
+  border-radius: 12px;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #0F1829 !important;
+  color: #fff !important;
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  border-radius: 8px;
+}
+
+.leaflet-popup-tip {
+  background: #0F1829 !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050A18;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E3A5F;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00D4FF;
+}
