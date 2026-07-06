@@ -57,25 +57,27 @@ const MOCK_TRAINS: Omit<TrainPosition, 'id' | 'last_updated'>[] = [
 ];
 
 export async function fetchLiveTrainPositions(): Promise<TrainPosition[]> {
-  const railoneApiKey = process.env.RAILONE_API_KEY;
-  const whereismytrainKey = process.env.WHERES_MY_TRAIN_API_KEY;
+  const railradarApiKey = process.env.RAILRADAR_API_KEY;
+  const rapidApiKey = process.env.RAPIDAPI_KEY;
   const indianRailKey = process.env.INDIAN_RAIL_API_KEY;
 
   const now = new Date().toISOString();
 
-  // PRIORITY 1: RailOne API
-  if (railoneApiKey) {
+  // PRIORITY 1: RailRadar API (Primary)
+  if (railradarApiKey) {
     try {
-      const res = await fetch('https://railone.io/api/v1/trains/running', {
-        headers: { Authorization: `Bearer ${railoneApiKey}` },
+      const res = await fetch('https://api.railradar.in/v1/trains/running', {
+        headers: { 
+          'Authorization': `Bearer ${railradarApiKey}`,
+          'x-api-key': railradarApiKey
+        },
         next: { revalidate: 30 }
       });
       if (res.ok) {
         const data = await res.json();
-        // Assume data returns { trains: [...] }
         if (data && Array.isArray(data.trains)) {
           return data.trains.map((t: any, idx: number) => ({
-            id: `railone-${t.trainNo || idx}`,
+            id: `railradar-${t.trainNo || idx}`,
             train_number: t.trainNo || `TR-${idx}`,
             train_name: t.trainName || 'Express Train',
             train_type: t.trainType || 'express',
@@ -87,50 +89,69 @@ export async function fetchLiveTrainPositions(): Promise<TrainPosition[]> {
             alp_phone: t.alpPhone || '+91-XXXXX-XXXXX',
             direction: t.direction === 'DOWN' ? 'DOWN' : 'UP',
             last_updated: now,
-            api_source: 'railone'
+            api_source: 'railradar'
           }));
         }
       }
     } catch (e) {
-      console.warn('RailOne API failed, trying fallback...', e);
+      console.warn('RailRadar API failed, trying RapidAPI...', e);
     }
   }
 
-  // PRIORITY 2: Where Is My Train cache/stationdata
-  if (whereismytrainKey) {
+  // PRIORITY 2: RapidAPI (Backup 1)
+  if (rapidApiKey) {
     try {
-      const res = await fetch(`https://whereismytrain.in/cache/stationdata?key=${whereismytrainKey}`, {
-        next: { revalidate: 30 }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data && Array.isArray(data.trains)) {
-          return data.trains.map((t: any, idx: number) => ({
-            id: `wimt-${t.trainNo || idx}`,
-            train_number: t.trainNo || `TR-${idx}`,
-            train_name: t.trainName || 'Express Train',
-            train_type: t.trainType || 'express',
-            current_km: t.currentKm || 0,
-            latitude: Number(t.lat) || 12.9342,
-            longitude: Number(t.lng) || 79.3725,
-            speed_kmh: Number(t.speed) || 80,
-            alp_name: t.alpName || 'Unknown ALP',
-            alp_phone: t.alpPhone || '+91-XXXXX-XXXXX',
-            direction: t.direction === 'DOWN' ? 'DOWN' : 'UP',
-            last_updated: now,
-            api_source: 'whereismytrain'
-          }));
+      const results: TrainPosition[] = [];
+      const departureDate = new Date().toISOString().split('T')[0].replace(/-/g, '');
+      
+      for (const t of MOCK_TRAINS) {
+        try {
+          const res = await fetch(`https://indian-railway-irctc.p.rapidapi.com/api/trains/v1/train/status?departure_date=${departureDate}&isH5=true&client=web&deviceIdentifier=Mozilla%2520Firefox-138.0.0.0&train_number=${t.train_number}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-rapid-api': 'rapid-api-database',
+              'x-rapidapi-host': 'indian-railway-irctc.p.rapidapi.com',
+              'x-rapidapi-key': rapidApiKey
+            },
+            next: { revalidate: 30 }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const statusInfo = data.data || data;
+            const speed = Number(statusInfo.speed || statusInfo.currentSpeed) || t.speed_kmh;
+            const currentKm = Number(statusInfo.currentKm) || t.current_km;
+            const lat = Number(statusInfo.lat || statusInfo.latitude) || t.latitude;
+            const lng = Number(statusInfo.lng || statusInfo.longitude) || t.longitude;
+
+            results.push({
+              id: `rapidapi-${t.train_number}`,
+              train_number: t.train_number,
+              train_name: statusInfo.trainName || t.train_name,
+              train_type: t.train_type,
+              current_km: currentKm,
+              latitude: lat,
+              longitude: lng,
+              speed_kmh: speed,
+              alp_name: t.alp_name,
+              alp_phone: t.alp_phone,
+              direction: t.direction,
+              last_updated: now,
+              api_source: 'rapidapi'
+            });
+          }
+        } catch (err) {
+          console.warn(`RapidAPI query failed for train ${t.train_number}:`, err);
         }
       }
+      if (results.length > 0) return results;
     } catch (e) {
-      console.warn('WhereIsMyTrain API failed, trying fallback...', e);
+      console.warn('RapidAPI backup failed, trying Indian Rail API...', e);
     }
   }
 
-  // PRIORITY 3: Indian Rail API
+  // PRIORITY 3: Indian Rail API (Backup 2)
   if (indianRailKey) {
     try {
-      // Loop through mock trains to query their live status using Indian Rail API
       const results: TrainPosition[] = [];
       for (const t of MOCK_TRAINS) {
         try {
@@ -152,7 +173,7 @@ export async function fetchLiveTrainPositions(): Promise<TrainPosition[]> {
               alp_phone: t.alp_phone,
               direction: t.direction,
               last_updated: now,
-              api_source: 'mock' // using metadata fallback internally
+              api_source: 'indianrail'
             });
           }
         } catch (err) {
@@ -166,15 +187,11 @@ export async function fetchLiveTrainPositions(): Promise<TrainPosition[]> {
   }
 
   // PRIORITY 4: Full mock fallback with slight dynamic movements
-  // Simulates actual movement of trains along the route corridor over time
-  const timeOffset = Date.now() / 1000; // in seconds
+  const timeOffset = Date.now() / 1000;
   
-  return MOCK_TRAINS.map((train, idx) => {
-    // Simulate slight position changes based on speed and time
-    // UP trains travel from higher km to lower, DOWN trains from lower to higher
-    // Chennai is around km 0, Salem is around km 200
+  return MOCK_TRAINS.map((train) => {
     const speedInKmPerSecond = train.speed_kmh / 3600;
-    const movement = (timeOffset * speedInKmPerSecond) % 40; // loop within a 40km segment
+    const movement = (timeOffset * speedInKmPerSecond) % 40;
     
     let currentKm = train.current_km;
     let lat = train.latitude;
@@ -182,7 +199,6 @@ export async function fetchLiveTrainPositions(): Promise<TrainPosition[]> {
 
     if (train.direction === 'UP') {
       currentKm = Math.max(10, train.current_km - movement);
-      // Interpolate lat/lng coordinates accordingly
       lat = train.latitude - (movement * 0.004);
       lng = train.longitude - (movement * 0.005);
     } else {

@@ -57,7 +57,7 @@ export interface TrainPosition {
   alp_phone: string | null;
   direction: 'UP' | 'DOWN';
   last_updated: string;
-  api_source: 'mock' | 'railone' | 'whereismytrain';
+  api_source: 'mock' | 'railradar' | 'rapidapi' | 'indianrail';
 }
 
 export interface Alert {

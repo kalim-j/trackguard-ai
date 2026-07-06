@@ -284,22 +284,22 @@ export default function AdminControlPanelPage() {
           </h2>
 
           <div className="glass-card p-5 border border-cyan-500/10 flex flex-col gap-4 bg-navy-950/20">
-            {/* RailOne */}
+            {/* RailRadar */}
             <div className="flex items-center justify-between text-xs">
               <div className="flex flex-col">
-                <span className="font-semibold text-gray-200">RailOne API Endpoint</span>
-                <span className="text-[10px] text-gray-500 font-mono">/api/v1/trains/running</span>
+                <span className="font-semibold text-gray-200">RailRadar API Endpoint</span>
+                <span className="text-[10px] text-gray-500 font-mono">/v1/trains/running</span>
               </div>
               <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
                 <CheckCircle className="h-3 w-3" /> ONLINE
               </span>
             </div>
 
-            {/* Whereismytrain */}
+            {/* RapidAPI */}
             <div className="flex items-center justify-between text-xs border-t border-cyan-500/5 pt-3">
               <div className="flex flex-col">
-                <span className="font-semibold text-gray-200">Where Is My Train API</span>
-                <span className="text-[10px] text-gray-500 font-mono">/cache/stationdata</span>
+                <span className="font-semibold text-gray-200">RapidAPI IRCTC Status Gateway</span>
+                <span className="text-[10px] text-gray-500 font-mono">/api/trains/v1/train/status</span>
               </div>
               <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
                 <CheckCircle className="h-3 w-3" /> ONLINE
