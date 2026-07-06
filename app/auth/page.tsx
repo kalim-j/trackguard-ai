@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Shield, ShieldAlert, CheckSquare } from 'lucide-react';
 import { useAuth } from '@/components/AuthProvider';
 import Hero3DScene from '@/components/3d/Hero3DScene';
+import CanvasErrorBoundary from '@/components/CanvasErrorBoundary';
 
 export default function LoginPage() {
   const { user, loading, signInWithGoogle } = useAuth();
@@ -29,7 +30,9 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-[calc(100vh-100px)] flex items-center justify-center overflow-hidden">
       {/* 3D Cinematic Background */}
-      <Hero3DScene />
+      <CanvasErrorBoundary fallback={<div className="absolute inset-0 bg-navy-950" />}>
+        <Hero3DScene />
+      </CanvasErrorBoundary>
       
       {/* Dark Vignette Overlay */}
       <div className="absolute inset-0 bg-navy-950/80 backdrop-blur-xs z-10" />

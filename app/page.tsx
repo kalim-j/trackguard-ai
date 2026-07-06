@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Shield, Eye, ShieldAlert, Check, X, ArrowRight, Activity, ChevronDown, Lock } from 'lucide-react';
 import Hero3DScene from '@/components/3d/Hero3DScene';
+import CanvasErrorBoundary from '@/components/CanvasErrorBoundary';
 import { useAuth } from '@/components/AuthProvider';
 
 export default function LandingPage() {
@@ -62,7 +63,9 @@ export default function LandingPage() {
       {/* SECTION 1: HERO VIEWPORT */}
       <section className="relative w-full h-[95vh] flex items-center justify-start overflow-hidden">
         {/* Full Viewport 3D Canvas Background */}
-        <Hero3DScene />
+        <CanvasErrorBoundary fallback={<div className="absolute inset-0 bg-navy-950" />}>
+          <Hero3DScene />
+        </CanvasErrorBoundary>
 
         {/* Ambient Overlay Vignette */}
         <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-950/80 to-transparent z-10" />

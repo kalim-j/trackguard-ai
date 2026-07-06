@@ -113,7 +113,7 @@ export default function AnimalMarker3D({
           
           <mesh position={[0, 0, -0.01]}>
             <planeGeometry args={[1.84, 0.59]} />
-            <meshBasicMaterial color="rgba(0,212,255,0.4)" depthTest={false} />
+            <meshBasicMaterial color="#00D4FF" transparent opacity={0.4} depthTest={false} />
           </mesh>
 
           {/* Sighting details */}

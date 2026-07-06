@@ -15,6 +15,7 @@ import MetricCard from '@/components/dashboard/MetricCard';
 import AlertFeed from '@/components/dashboard/AlertFeed';
 import TrainTable from '@/components/dashboard/TrainTable';
 import SensorGrid from '@/components/dashboard/SensorGrid';
+import CanvasErrorBoundary from '@/components/CanvasErrorBoundary';
 import { Sensor } from '@/lib/types';
 
 // Dynamically import 3D track scene to prevent SSR issues (WebGL relies on browser context)
@@ -252,7 +253,9 @@ export default function DashboardPage() {
           <div className="hidden md:block">
             {mapMode === '3d' ? (
               <div className="h-[430px]">
-                <TrackScene3D trains={trains} animals={detections} alerts={liveAlerts} />
+                <CanvasErrorBoundary>
+                  <TrackScene3D trains={trains} animals={detections} alerts={liveAlerts} />
+                </CanvasErrorBoundary>
               </div>
             ) : (
               <div className="h-[400px]">
