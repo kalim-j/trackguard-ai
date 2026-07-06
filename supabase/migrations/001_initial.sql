@@ -104,13 +104,10 @@ CREATE TABLE incidents (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable Row Level Security
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE alerts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE animal_detections ENABLE ROW LEVEL SECURITY;
-
--- RLS: Users can only see their own row
-CREATE POLICY "Users read own" ON users FOR SELECT USING (firebase_uid = auth.uid()::text);
+-- Disable Row Level Security (safest for client-side Firebase + Supabase anon client queries)
+ALTER TABLE users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE alerts DISABLE ROW LEVEL SECURITY;
+ALTER TABLE animal_detections DISABLE ROW LEVEL SECURITY;
 
 -- Seed realistic incident data from WII/news sources
 INSERT INTO incidents (date, animal_type, km_marker, route, outcome, data_source) VALUES
